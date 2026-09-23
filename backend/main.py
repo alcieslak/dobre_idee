@@ -8,13 +8,18 @@ engine = create_engine("sqlite:///poc_database.db")
 
 
 def read_data():
-    df = pd.read_excel("dane.xlsx", engine="openpyxl")
+    df = pd.read_excel("dane.xlsx", engine="openpyxl", header=8)
+    df = df.drop(df.columns[0], axis=1)
+
+    with engine.connect() as connection:
+        connection.execute(text("DROP TABLE IF EXISTS dane"))
+        connection.commit()
 
     df.to_sql(
         "dane",
         engine,
-        if_exists="append",
-        index=False
+        if_exists="replace",
+        index=False,
     )
 
 
@@ -39,9 +44,7 @@ def home():
     return df.to_dict(orient="records")
 
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     read_data()
-    home()
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    print(get_data('Cieślak Krzysztof'))
+    get_data('Cieślak Krzysztof')
