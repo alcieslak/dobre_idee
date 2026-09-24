@@ -6,7 +6,7 @@ from backend.services import engine, find_customer, initialize_database
 
 
 @pytest.fixture
-def test_database():
+def init():
     with engine.connect() as connection:
         connection.execute(text("DROP TABLE IF EXISTS dane"))
         connection.execute(text("""
@@ -42,33 +42,33 @@ def test_initialize_database_creates_table():
     assert columns == ["kontrahent", "telefon"]
 
 
-def test_get_all_data(test_database):
+def test_get_all_data(init):
     actual = find_customer()
 
     assert len(actual) == 4
 
 
-def test_get_data_by_contractor(test_database):
+def test_get_data_by_contractor(init):
     actual = find_customer('Krzysztof Nowak')
 
     assert len(actual) == 1
     assert actual[0]["kontrahent"] == "Krzysztof Nowak"
 
 
-def test_get_data_partial_name(test_database):
+def test_get_data_partial_name(init):
     actual = find_customer('ABC Sp. z o.o.')
 
     assert len(actual) == 1
     assert actual[0]["kontrahent"] == "ABC Sp. z o.o."
 
 
-def test_get_data_not_found(test_database):
+def test_get_data_not_found(init):
     actual = find_customer("Nieistniejący")
 
     assert actual == []
 
 
-def test_get_data_with_filter(test_database):
+def test_get_data_with_filter(init):
     actual = find_customer('XYZ')
 
     assert len(actual) == 0

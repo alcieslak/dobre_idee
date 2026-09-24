@@ -1,8 +1,5 @@
-from fastapi import FastAPI
 from sqlalchemy import create_engine, text
 import pandas as pd
-
-app = FastAPI()
 
 engine = create_engine("sqlite:///poc_database.db")
 
@@ -13,12 +10,6 @@ def read_excel_data():
         engine="openpyxl",
         header=8
     )
-
-
-@app.get("/")
-def home():
-    df = pd.read_sql("SELECT * FROM dane", "sqlite:///poc_database.db")
-    return df.to_dict(orient="records")
 
 
 def initialize_database(df):
@@ -36,7 +27,6 @@ def initialize_database(df):
     )
 
 
-@app.get("/dane")
 def find_customer(kontrahent: str = None):
     query = "SELECT * FROM dane"
     params = {}
