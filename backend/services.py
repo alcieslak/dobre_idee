@@ -32,8 +32,8 @@ def find_customer(kontrahent: str = None):
     params = {}
 
     if kontrahent:
-        query += " WHERE kontrahent = :kontrahent"
-        params["kontrahent"] = kontrahent
+        query += " WHERE kontrahent LIKE :kontrahent"
+        params["kontrahent"] = f"%{kontrahent}%"
 
     with engine.connect() as connection:
         result = connection.execute(text(query), params)

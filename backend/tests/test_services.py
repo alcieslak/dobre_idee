@@ -70,5 +70,5 @@ def test_get_data_not_found(init):
 
 def test_get_data_with_filter(init):
     actual = find_customer('XYZ')
-
-    assert len(actual) == 0
+    assert actual[0]["kontrahent"] == "XYZ Jan Kowalski"
+    assert len(actual) == 1
