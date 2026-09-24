@@ -1,15 +1,19 @@
-import pandas as pd
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
 
 from services import find_customer
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 def home():
-    df = pd.read_sql("SELECT * FROM dane", "sqlite:///poc_database.db")
-    return df.to_dict(orient="records")
+    html_file = Path(__file__).parent / "templates" / "index.html"
+
+    return html_file.read_text(encoding="utf-8")
 
 
 @app.get("/dane")

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Wyszukiwanie kontrahentów</title>
+    <link rel="stylesheet" href="/static/style.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f6f8;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+
+        .search {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background-color: #333;
+            color: white;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f0f1f3;
+        }
+
+        .message {
+            color: #666;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Wyszukiwanie kontrahentów</h1>
+
+    <div class="search">
+        <input
+            type="text"
+            id="kontrahent"
+            placeholder="Wpisz nazwę kontrahenta"
+        >
+
+        <button onclick="szukaj()">
+            Szukaj
+        </button>
+    </div>
+
+    <div id="wyniki" class="results"><</div>
+
+</div>
+
+
+<script>
+
+async function szukaj() {
+
+    const kontrahent = document
+        .getElementById("kontrahent")
+        .value;
+
+    const url = "/dane?kontrahent=" +
+        encodeURIComponent(kontrahent);
+
+    const response = await fetch(url);
+
+    const dane = await response.json();
+
+    const wyniki = document.getElementById("wyniki");
+
+    if (dane.length === 0) {
+        wyniki.innerHTML =
+            '<p class="message">Nie znaleziono danych.</p>';
+        return;
+    }
+
+    const kolumny = Object.keys(dane[0]);
+
+    let html = "<table>";
+
+    html += "<thead><tr>";
+
+    kolumny.forEach(kolumna => {
+        html += `<th>${kolumna}</th>`;
+    });
+
+    html += "</tr></thead>";
+
+    html += "<tbody>";
+
+    dane.forEach(wiersz => {
+
+        html += "<tr>";
+
+        kolumny.forEach(kolumna => {
+            html += `<td>${wiersz[kolumna] ?? ""}</td>`;
+        });
+
+        html += "</tr>";
+
+    });
+
+    html += "</tbody></table>";
+
+    wyniki.innerHTML = html;
+}
+
+</script>
+
+</body>
+</html>
