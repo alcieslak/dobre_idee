@@ -7,14 +7,21 @@ app = FastAPI()
 engine = create_engine("sqlite:///poc_database.db")
 
 
+def read_excel_data():
+    return pd.read_excel(
+        "dane.xlsx",
+        engine="openpyxl",
+        header=8
+    )
+
+
 @app.get("/")
 def home():
     df = pd.read_sql("SELECT * FROM dane", "sqlite:///poc_database.db")
     return df.to_dict(orient="records")
 
 
-def read_data():
-    df = pd.read_excel("dane.xlsx", engine="openpyxl", header=8)
+def initialize_database(df):
     df = df.drop(df.columns[0], axis=1)
 
     with engine.connect() as connection:
@@ -30,7 +37,7 @@ def read_data():
 
 
 @app.get("/dane")
-def get_data(kontrahent: str = None):
+def find_customer(kontrahent: str = None):
     query = "SELECT * FROM dane"
     params = {}
 

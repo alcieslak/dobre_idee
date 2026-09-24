@@ -1,6 +1,6 @@
-from backend.services import read_data, get_data
+from backend.services import find_customer, read_excel_data, initialize_database
 
 if __name__ == '__main__':
-    read_data()
-    print(get_data('Cieślak Krzysztof'))
-    get_data('Cieślak Krzysztof')
+    df = read_excel_data()
+    initialize_database(df)
+    find_customer('Cieślak Krzysztof')

@@ -1,7 +1,8 @@
+import pandas as pd
 import pytest
 from sqlalchemy import create_engine, text
 
-from backend.services import engine, get_data
+from backend.services import engine, find_customer, initialize_database
 
 
 @pytest.fixture
@@ -25,33 +26,49 @@ def test_database():
         connection.commit()
 
 
+def test_initialize_database_creates_table():
+    df = pd.DataFrame({
+        "do_usuniecia": ["x", "y"],
+        "kontrahent": ["Anna", "Jan"],
+        "telefon": ["123", "456"]
+    })
+
+    initialize_database(df)
+
+    with engine.connect() as connection:
+        actual = connection.execute(text("PRAGMA table_info(dane)"))
+        columns = [row[1] for row in actual]
+
+    assert columns == ["kontrahent", "telefon"]
+
+
 def test_get_all_data(test_database):
-    actual = get_data()
+    actual = find_customer()
 
     assert len(actual) == 4
 
 
 def test_get_data_by_contractor(test_database):
-    actual = get_data('Krzysztof Nowak')
+    actual = find_customer('Krzysztof Nowak')
 
     assert len(actual) == 1
     assert actual[0]["kontrahent"] == "Krzysztof Nowak"
 
 
 def test_get_data_partial_name(test_database):
-    actual = get_data('ABC Sp. z o.o.')
+    actual = find_customer('ABC Sp. z o.o.')
 
     assert len(actual) == 1
     assert actual[0]["kontrahent"] == "ABC Sp. z o.o."
 
 
 def test_get_data_not_found(test_database):
-    actual = get_data("Nieistniejący")
+    actual = find_customer("Nieistniejący")
 
     assert actual == []
 
 
 def test_get_data_with_filter(test_database):
-    actual = get_data('XYZ')
+    actual = find_customer('XYZ')
 
     assert len(actual) == 0
